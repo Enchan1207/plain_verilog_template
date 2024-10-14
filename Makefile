@@ -6,14 +6,20 @@ SIM_DIR := sim
 IVERILOG := iverilog
 
 # testsディレクトリにある *.test.v をコンパイル対象とする
-OUT_FILES := $(patsubst $(TESTS_DIR)/%.test.v, $(TESTS_DIR)/%.out, $(wildcard $(TESTS_DIR)/*.test.v))
+OUT_FILES := $(patsubst $(TESTS_DIR)/%.test.v, $(SIM_DIR)/%.out, $(wildcard $(TESTS_DIR)/*.test.v))
 all: $(OUT_FILES)
 
-%.out: %.test.v
+$(SIM_DIR)/%.out: $(TESTS_DIR)/%.test.v
 	@mkdir -p $(SIM_DIR)
-	$(IVERILOG) -I $(SOURCE_DIR) -o $(SIM_DIR)/$(notdir $@) $<
+	$(IVERILOG) -I $(SOURCE_DIR) -o $@ $<
+
+test: all
+	@for tb in $(OUT_FILES); do \
+		echo "Running $$tb..."; \
+		$$tb; \
+	done
 
 clean:
-	${RM} $(OUT_FILES)
+	@find . -name "*.out" -o -name "*.vcd" | xargs -I {} rm -f {}
 
-.PHONY: clean all
+.PHONY: clean all test

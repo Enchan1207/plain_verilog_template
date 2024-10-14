@@ -32,6 +32,12 @@ module CounterTest ();
         #10;
         $display("Time: %0t, CLR: %b, Q: %X", $time, CLR, Q);
 
+        CLR <= 0;
+        #1;
+        if (Q != 0) begin
+            $fatal(1);
+        end
+
         $finish();
     end
 
